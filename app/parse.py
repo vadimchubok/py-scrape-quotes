@@ -8,11 +8,13 @@ from bs4 import BeautifulSoup, Tag
 
 BASE_URL = "https://quotes.toscrape.com/"
 
+
 @dataclass
 class Quote:
     text: str
     author: str
     tags: list[str]
+
 
 def page_generator() -> Generator[BeautifulSoup, None, None]:
     page_number = 1
@@ -30,9 +32,10 @@ def page_generator() -> Generator[BeautifulSoup, None, None]:
             yield soup
             page_number += 1
 
+
 def parse_single_quote(quote: Tag) -> Quote:
     text = quote.select_one("span.text").get_text(strip=True)
-    author =  quote.select_one("small.author").get_text(strip=True)
+    author = quote.select_one("small.author").get_text(strip=True)
     tags_block = quote.select_one("div.tags")
     tags_elements = tags_block.select("a.tag")
     tags = [tag.get_text(strip=True) for tag in tags_elements]
@@ -48,6 +51,7 @@ def parse_page(page_soup: BeautifulSoup) -> list[Quote]:
     for quote in page_soup.select(".quote"):
         quotes.append(parse_single_quote(quote))
     return quotes
+
 
 def get_quotes() -> list[Quote]:
     quotes = []
@@ -70,6 +74,7 @@ def save_to_csv(quotes: list[Quote], output_path: str) -> None:
             data = asdict(quote)
 
             writer.writerow(data)
+
 
 def main(output_csv_path: str) -> None:
     quotes = get_quotes()
